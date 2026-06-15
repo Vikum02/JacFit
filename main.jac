@@ -167,6 +167,42 @@ walker LogExercise {
     }
 }
 
+walker DailyReport{
+   has user_name: str = "";
+       report_date: str = "";
+
+   can find_user with Root entry {
+       for u in [-->][?:User]{
+        if u.name == self.user_name {
+            visit u;
+        }
+       } 
+   }
+
+   can on_user with User entry {
+       target = self.report_date if self.report_date else str(date.today());
+         for d in [-->][?:Day] {
+            if d.date == target {
+                visit d;
+            }
+        }
+   } 
+   can on_day with Day entry {
+    meals = [m for m in [<--][?:Meal]];
+    exercises = [e for e in [<--][?:Exercise]];
+
+    report{
+        "date": here.date,
+        "calories_in": here.total_calories_in,
+        "calories_out": here.total_calories_out,
+        "net": here.total_calories_in - here.total_calories_out,
+        "meals": [m.name for m in meals],
+        "exercises": [e.name for e in exercises]
+    };
+
+   }
+
+}
 with entry {
     root spawn CreateUser(
         name="Alex",
