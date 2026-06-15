@@ -201,8 +201,114 @@ walker DailyReport{
     };
 
    }
-
 }
+
+walker WeeklyTrend {
+    has user_name: str = "";
+    
+    can find_user with Root entry {
+         for u in [-->][?:User]{
+          if u.name == self.user_name {
+                visit u;
+          }
+        }
+    }
+
+    can on_user with User entry {
+        all_days: list[Day] = [d for d in [-->][?:Day]];
+        all_days.reverse();
+        last_7: list[Day] = all_days[:7];
+
+        weights = [d.weight_log for d in last_7 if d.weight_log > 0.0];
+        total_in = sum(d.total_calories_in for d in last_7);
+        logged = len([d for d in last_7 if d.total_calories_in > 0.0]);
+
+        report{
+            "days": [{"date": d.date,
+                     "calories_in": d.total_calories_in,
+                     "calories_out": d.total_calories_out,
+                     "net": d.total_calories_in - d.total_calories_out,
+                     "weight": d.weight_log} for d in last_7],
+                   
+            "avg_daily_intake": total_in / len(last_7) if last_7 else 0.0,
+            "weight_trend": weights,
+            "consistency": f"{logged}/{len(last_7)} days logged"
+         };          
+        }    
+    
+    }
+
+walker ProgressCheck {
+    has user_name: str = "";
+    has current_weight: float = 0.0;
+    has goal_type: str = "";
+
+    can find_user with Root entry {
+        for u in [-->][?:User]{
+            if u.name == self.user_name {
+                visit u;
+            }
+        }
+    }
+    can on_user with User entry {
+        self.current_weight = here.weight;
+        self.goal_type = here.goal_type;
+        visit [-->][?:Goal];
+    }
+
+    can on_goal with Goal entry{
+        diff: float = self.current_weight - here.target_weight;
+        kg_per_day: float = 500.0 / 7700.0;
+        days_to_goal: float = diff / kg_per_day if diff >= 0.0 else -diff / kg_per_day;
+
+        report{
+            "current_weight": self.current_weight,
+            "target_weight": here.target_weight,
+            "difference_kg": diff,
+            "goal_type": self.goal_type,
+            "deadline": here.deadline,
+            "daily_calorie_goal": here.daily_calorie_goal,
+            "estimated_days_to_goal": days_to_goal
+        };
+    }
+}    
+
+with entry {
+    root spawn CreateUser(
+        name="Alex",
+        weight=80.0,
+        height=175.0,
+        goal_type="lose",
+        target_weight=72.0,
+        daily_calorie_goal=2000.0,
+        deadline="2026-12-31"
+    );
+
+    root spawn LogMeal(
+        user_name="Alex",
+        meal_name="Breakfast",
+        meal_time="08:00",
+        calories=450.0,
+        protein=30.0,
+        carbs=40.0,
+        fat=12.0
+    );
+
+    root spawn LogExercise(
+        user_name="Alex",
+        ex_name="Morning Run",
+        duration_min=30,
+        calories_burned=300.0,
+        ex_type="cardio"
+    );
+
+    root spawn DailyReport(user_name="Alex");
+
+    root spawn WeeklyTrend(user_name="Alex");
+
+    root spawn ProgressCheck(user_name="Alex");
+}
+
 with entry {
     root spawn CreateUser(
         name="Alex",
