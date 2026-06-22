@@ -1,4 +1,11 @@
 import from datetime {date}
+import from byllm.lib { Model }
+
+glob llm = Model(model_name="gpt-4o-mini");
+
+"""Suggest a healthy meal given remaining calorie budget and the user's
+fitness goal (lose/gain/maintain). Return meal name and brief description."""
+def suggest_meal(remaining_calories: float, goal_type: str) -> str by llm();
 
 node User {
     has name : str = "",
@@ -271,7 +278,41 @@ walker ProgressCheck {
             "estimated_days_to_goal": days_to_goal
         };
     }
-}    
+}  
+
+walker MealSuggest {
+    has user_name: str = "";
+    has calories_so_far: float = 0.0;
+    has goal_type: str = "";
+
+    can find_user with Root entry {
+        for u in [-->][?:User] {
+            if u.name == self.user_name {
+                visit u;
+            }
+        }
+    }
+
+    can on_user with User entry {
+        today = str(date.today());
+        self.goal_type = here.goal_type;
+        for d in [-->][?:Day] {
+            if d.date == today {
+                self.calories_so_far = d.total_calories_in;
+            }
+        }
+        visit [-->][?:Goal];
+    }
+
+    can on_goal with Goal entry {
+        remaining: float = here.daily_calorie_goal - self.calories_so_far;
+        suggestion = suggest_meal(remaining, self.goal_type);
+        report {
+            "remaining_calories": remaining,
+            "suggestion": suggestion
+        };
+    }
+}
 
 with entry {
     root spawn CreateUser(
@@ -307,6 +348,8 @@ with entry {
     root spawn WeeklyTrend(user_name="Alex");
 
     root spawn ProgressCheck(user_name="Alex");
+
+    root spawn MealSuggest(user_name="Alex");
 }
 
 with entry {
