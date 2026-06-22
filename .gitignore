@@ -1,7 +1,7 @@
 venv/
+.jac/cache/
+.jac/data/
 __pycache__/
 *.pyc
-*.pyo
-.jac_gen/
-*.db
-.env
+node_modules/
+dist/
