@@ -344,11 +344,8 @@ with entry {
     );
 
     root spawn DailyReport(user_name="Alex");
-
     root spawn WeeklyTrend(user_name="Alex");
-
     root spawn ProgressCheck(user_name="Alex");
-
     root spawn MealSuggest(user_name="Alex");
 }
 
