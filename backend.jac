@@ -277,6 +277,109 @@ walker ProgressCheck {
     }
 }
 
+"""Suggest an exercise routine given the user's goal and calories burned today."""
+def suggest_exercise(calories_burned: float, goal_type: str) -> str by llm();
+
+walker LogWeight {
+    has user_name: str = "",
+        weight: float = 0.0;
+
+    can find_user with Root entry {
+        for u in [-->][?:User] {
+            if u.name == self.user_name {
+                visit u;
+            }
+        }
+    }
+
+    can on_user with User entry {
+        here.weight = self.weight;
+        today = str(date.today());
+        today_days = [d for d in [-->][?:Day] if d.date == today];
+        if not today_days {
+            here ++> Day(date=today);
+        }
+        for d in [-->][?:Day] {
+            if d.date == today {
+                d.weight_log = self.weight;
+            }
+        }
+        report {"weight": self.weight};
+    }
+}
+
+walker UpdateGoal {
+    has user_name: str = "",
+        weight: float = 0.0,
+        height: float = 0.0,
+        goal_type: str = "maintain",
+        target_weight: float = 0.0,
+        daily_calorie_goal: float = 2000.0,
+        deadline: str = "";
+
+    can find_user with Root entry {
+        for u in [-->][?:User] {
+            if u.name == self.user_name {
+                visit u;
+            }
+        }
+    }
+
+    can on_user with User entry {
+        here.weight = self.weight;
+        here.height = self.height;
+        here.goal_type = self.goal_type;
+        visit [-->][?:Goal];
+    }
+
+    can on_goal with Goal entry {
+        here.target_weight = self.target_weight;
+        here.daily_calorie_goal = self.daily_calorie_goal;
+        here.deadline = self.deadline;
+        report {
+            "weight": self.weight,
+            "height": self.height,
+            "goal_type": self.goal_type,
+            "target_weight": self.target_weight,
+            "daily_calorie_goal": self.daily_calorie_goal,
+            "deadline": self.deadline
+        };
+    }
+}
+
+walker ExerciseSuggest {
+    has user_name: str = "",
+        calories_burned: float = 0.0,
+        goal_type: str = "";
+
+    can find_user with Root entry {
+        for u in [-->][?:User] {
+            if u.name == self.user_name {
+                visit u;
+            }
+        }
+    }
+
+    can on_user with User entry {
+        today = str(date.today());
+        self.goal_type = here.goal_type;
+        for d in [-->][?:Day] {
+            if d.date == today {
+                self.calories_burned = d.total_calories_out;
+            }
+        }
+        visit [-->][?:Goal];
+    }
+
+    can on_goal with Goal entry {
+        suggestion = suggest_exercise(self.calories_burned, self.goal_type);
+        report {
+            "calories_burned_today": self.calories_burned,
+            "suggestion": suggestion
+        };
+    }
+}
+
 walker MealSuggest {
     has user_name: str = "",
         calories_so_far: float = 0.0,

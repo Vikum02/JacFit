@@ -5,6 +5,9 @@ import { useState } from "@jac/runtime";
 async function MealSuggest() {
   return await __jacCallFunction("MealSuggest", {});
 }
+async function ExerciseSuggest() {
+  return await __jacCallFunction("ExerciseSuggest", {});
+}
 const _jac = {
   int: {
     bit_length(n) {
@@ -1340,21 +1343,37 @@ const _jac = {
 };
 function MealSuggestCard(props) {
   const {userName} = props;
-  const [suggestion, setSuggestion] = useState("");
+  const [mealSuggestion, setMealSuggestion] = useState("");
   const [remaining, setRemaining] = useState("");
-  const [loading, setLoading] = useState(false);
-  async function handleSuggest() {
-    setLoading(true);
-    setSuggestion("");
+  const [mealLoading, setMealLoading] = useState(false);
+  const [exerciseSuggestion, setExerciseSuggestion] = useState("");
+  const [burnedToday, setBurnedToday] = useState("");
+  const [exerciseLoading, setExerciseLoading] = useState(false);
+  async function handleMealSuggest() {
+    setMealLoading(true);
+    setMealSuggestion("");
     let result = await __jacSpawn("MealSuggest", "", {"user_name": userName});
     if (_jac.builtin.bool(result.reports)) {
       let data = result.reports[0];
       setRemaining(String(data["remaining_calories"]));
-      setSuggestion(String(data["suggestion"]));
+      setMealSuggestion(String(data["suggestion"]));
     }
-    setLoading(false);
+    setMealLoading(false);
   }
-  return __jacJsx("div", {"style": {"background": "#fff", "borderRadius": "12px", "padding": "28px", "boxShadow": "0 1px 3px rgba(0,0,0,0.1)"}}, [__jacJsx("h2", {"style": {"color": "#166534", "marginBottom": "8px"}}, ["AI Meal Suggestion"]), __jacJsx("p", {"style": {"color": "#6b7280", "fontSize": "14px", "marginBottom": "24px"}}, ["Get a personalised meal suggestion based on your remaining calories for today."]), __jacJsx("button", {"onClick": handleSuggest, "style": {"background": "#16a34a", "color": "#fff", "border": "none", "padding": "12px 28px", "borderRadius": "8px", "fontSize": "16px", "fontWeight": "600", "marginBottom": "24px"}}, [((loading && "Thinking...") || "Suggest My Next Meal")]), ((suggestion && __jacJsx("div", {"style": {"background": "#f0fdf4", "borderRadius": "10px", "padding": "20px", "borderLeft": "4px solid #16a34a"}}, [__jacJsx("p", {"style": {"color": "#166534", "fontWeight": "600", "marginBottom": "8px"}}, ["Remaining: ", remaining, " kcal"]), __jacJsx("p", {"style": {"color": "#374151", "lineHeight": "1.6"}}, [suggestion])])) || null)]);
+  async function handleExerciseSuggest() {
+    setExerciseLoading(true);
+    setExerciseSuggestion("");
+    let result = await __jacSpawn("ExerciseSuggest", "", {"user_name": userName});
+    if (_jac.builtin.bool(result.reports)) {
+      let data = result.reports[0];
+      setBurnedToday(String(data["calories_burned_today"]));
+      setExerciseSuggestion(String(data["suggestion"]));
+    }
+    setExerciseLoading(false);
+  }
+  let cardStyle = {"background": "#fff", "borderRadius": "12px", "padding": "28px", "boxShadow": "0 1px 3px rgba(0,0,0,0.1)", "marginBottom": "20px"};
+  let btnStyle = {"background": "#16a34a", "color": "#fff", "border": "none", "padding": "12px 28px", "borderRadius": "8px", "fontSize": "15px", "fontWeight": "600", "marginBottom": "20px"};
+  return __jacJsx("div", {}, [__jacJsx("div", {"style": cardStyle}, [__jacJsx("h2", {"style": {"color": "#166534", "marginBottom": "6px"}}, ["AI Meal Suggestion"]), __jacJsx("p", {"style": {"color": "#6b7280", "fontSize": "14px", "marginBottom": "20px"}}, ["Personalised meal idea based on your remaining calories today."]), __jacJsx("button", {"onClick": handleMealSuggest, "style": btnStyle}, [((mealLoading && "Thinking...") || "Suggest My Next Meal")]), ((mealSuggestion && __jacJsx("div", {"style": {"background": "#f0fdf4", "borderRadius": "10px", "padding": "20px", "borderLeft": "4px solid #16a34a"}}, [__jacJsx("p", {"style": {"color": "#166534", "fontWeight": "600", "marginBottom": "8px"}}, ["Remaining: ", remaining, " kcal"]), __jacJsx("p", {"style": {"color": "#374151", "lineHeight": "1.6"}}, [mealSuggestion])])) || null)]), __jacJsx("div", {"style": cardStyle}, [__jacJsx("h2", {"style": {"color": "#166534", "marginBottom": "6px"}}, ["AI Exercise Suggestion"]), __jacJsx("p", {"style": {"color": "#6b7280", "fontSize": "14px", "marginBottom": "20px"}}, ["Personalised workout idea based on your goal and today's activity."]), __jacJsx("button", {"onClick": handleExerciseSuggest, "style": btnStyle}, [((exerciseLoading && "Thinking...") || "Suggest a Workout")]), ((exerciseSuggestion && __jacJsx("div", {"style": {"background": "#f0fdf4", "borderRadius": "10px", "padding": "20px", "borderLeft": "4px solid #16a34a"}}, [__jacJsx("p", {"style": {"color": "#166534", "fontWeight": "600", "marginBottom": "8px"}}, ["Burned today: ", burnedToday, " kcal"]), __jacJsx("p", {"style": {"color": "#374151", "lineHeight": "1.6"}}, [exerciseSuggestion])])) || null)])]);
 }
 export {MealSuggestCard};
 if (typeof globalThis !== "undefined") { if (!globalThis.__jacEndpointEffects__) globalThis.__jacEndpointEffects__ = {}; Object.assign(globalThis.__jacEndpointEffects__, {"func:MealSuggestCard": {"is_writer": true, "touches": ["*"]}}); };

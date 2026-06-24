@@ -1,9 +1,12 @@
-/* Source: /home/vikum_02/JacFit/components/LogMeal.cl.jac */
+/* Source: /home/vikum_02/JacFit/components/Profile.cl.jac */
 import {__jacJsx, __jacSpawn} from "@jac/runtime";
 import { __jacCallFunction } from "@jac/runtime";
 import { useState } from "@jac/runtime";
-async function LogMeal() {
-  return await __jacCallFunction("LogMeal", {});
+async function UpdateGoal() {
+  return await __jacCallFunction("UpdateGoal", {});
+}
+async function LogWeight() {
+  return await __jacCallFunction("LogWeight", {});
 }
 const _jac = {
   int: {
@@ -1338,29 +1341,25 @@ const _jac = {
     return { BaseException, Exception, ArithmeticError, ZeroDivisionError, OverflowError, FloatingPointError, LookupError, IndexError, KeyError, ValueError, TypeError: TypeError_, AttributeError, RuntimeError, NotImplementedError, RecursionError, OSError, FileNotFoundError, FileExistsError, PermissionError, TimeoutError, IsADirectoryError, NotADirectoryError, AssertionError, ImportError, ModuleNotFoundError, NameError, UnboundLocalError, StopIteration, StopAsyncIteration, EOFError, MemoryError, ReferenceError: ReferenceError_, KeyboardInterrupt, SystemExit, GeneratorExit };
   })()
 };
-function LogMealForm(props) {
+function ProfileForm(props) {
   const {userName, onDone} = props;
-  const [mealName, setMealName] = useState("");
-  const [mealTime, setMealTime] = useState("");
-  const [calories, setCalories] = useState("");
-  const [protein, setProtein] = useState("");
-  const [carbs, setCarbs] = useState("");
-  const [fat, setFat] = useState("");
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+  const [goalType, setGoalType] = useState("maintain");
+  const [targetWeight, setTargetWeight] = useState("");
+  const [dailyCalories, setDailyCalories] = useState("2000");
+  const [deadline, setDeadline] = useState("");
+  const [logWeight, setLogWeight] = useState("");
   const [status, setStatus] = useState("");
-  async function handleSubmit() {
-    if ((!mealName || !calories)) {
-      setStatus("Meal name and calories are required.");
+  const [weightStatus, setWeightStatus] = useState("");
+  async function handleSaveGoal() {
+    if (((!weight || !height) || !targetWeight)) {
+      setStatus("Weight, height and target weight are required.");
       return;
     }
     try {
-      await __jacSpawn("LogMeal", "", {"user_name": userName, "meal_name": mealName, "meal_time": mealTime, "calories": parseFloat(calories), "protein": (protein ? parseFloat(protein) : 0.0), "carbs": (carbs ? parseFloat(carbs) : 0.0), "fat": (fat ? parseFloat(fat) : 0.0)});
-      setStatus("Meal logged!");
-      setMealName("");
-      setMealTime("");
-      setCalories("");
-      setProtein("");
-      setCarbs("");
-      setFat("");
+      await __jacSpawn("UpdateGoal", "", {"user_name": userName, "weight": parseFloat(weight), "height": parseFloat(height), "goal_type": goalType, "target_weight": parseFloat(targetWeight), "daily_calorie_goal": (dailyCalories ? parseFloat(dailyCalories) : 2000.0), "deadline": deadline});
+      setStatus("Profile saved!");
       onDone();
     } catch (__jac_e) {
       if ((__jac_e instanceof _jac.exc.Exception)) {
@@ -1371,22 +1370,43 @@ function LogMealForm(props) {
       }
     }
   }
-  let inputStyle = {"width": "100%", "padding": "10px 14px", "border": "1px solid #d1fae5", "borderRadius": "8px", "fontSize": "15px"};
-  let labelStyle = {"display": "block", "color": "#166534", "fontWeight": "600", "marginBottom": "6px"};
-  return __jacJsx("div", {"style": {"background": "#fff", "borderRadius": "12px", "padding": "28px", "boxShadow": "0 1px 3px rgba(0,0,0,0.1)"}}, [__jacJsx("h2", {"style": {"color": "#166534", "marginBottom": "24px"}}, ["Log a Meal"]), __jacJsx("div", {"style": {"marginBottom": "16px"}}, [__jacJsx("label", {"style": labelStyle}, ["Meal Name"]), __jacJsx("input", {"type": "text", "value": mealName, "placeholder": "e.g. Breakfast", "onChange": e => {
-    setMealName(e.target.value);
-  }, "style": inputStyle}, [])]), __jacJsx("div", {"style": {"marginBottom": "16px"}}, [__jacJsx("label", {"style": labelStyle}, ["Time"]), __jacJsx("input", {"type": "text", "value": mealTime, "placeholder": "e.g. 08:00", "onChange": e => {
-    setMealTime(e.target.value);
-  }, "style": inputStyle}, [])]), __jacJsx("div", {"style": {"marginBottom": "16px"}}, [__jacJsx("label", {"style": labelStyle}, ["Calories"]), __jacJsx("input", {"type": "text", "value": calories, "placeholder": "e.g. 450", "onChange": e => {
-    setCalories(e.target.value);
-  }, "style": inputStyle}, [])]), __jacJsx("div", {"style": {"marginBottom": "16px"}}, [__jacJsx("label", {"style": labelStyle}, ["Protein (g)"]), __jacJsx("input", {"type": "text", "value": protein, "placeholder": "e.g. 30", "onChange": e => {
-    setProtein(e.target.value);
-  }, "style": inputStyle}, [])]), __jacJsx("div", {"style": {"marginBottom": "16px"}}, [__jacJsx("label", {"style": labelStyle}, ["Carbs (g)"]), __jacJsx("input", {"type": "text", "value": carbs, "placeholder": "e.g. 40", "onChange": e => {
-    setCarbs(e.target.value);
-  }, "style": inputStyle}, [])]), __jacJsx("div", {"style": {"marginBottom": "16px"}}, [__jacJsx("label", {"style": labelStyle}, ["Fat (g)"]), __jacJsx("input", {"type": "text", "value": fat, "placeholder": "e.g. 12", "onChange": e => {
-    setFat(e.target.value);
-  }, "style": inputStyle}, [])]), __jacJsx("button", {"onClick": handleSubmit, "style": {"background": "#16a34a", "color": "#fff", "border": "none", "padding": "12px 28px", "borderRadius": "8px", "fontSize": "16px", "fontWeight": "600"}}, ["Log Meal"]), ((status && __jacJsx("p", {"style": {"marginTop": "14px", "color": "#16a34a", "fontWeight": "600"}}, [status])) || null)]);
+  async function handleLogWeight() {
+    if (!logWeight) {
+      setWeightStatus("Enter a weight value.");
+      return;
+    }
+    try {
+      await __jacSpawn("LogWeight", "", {"user_name": userName, "weight": parseFloat(logWeight)});
+      setWeightStatus("Weight logged!");
+      setLogWeight("");
+      onDone();
+    } catch (__jac_e) {
+      if ((__jac_e instanceof _jac.exc.Exception)) {
+        let e = __jac_e;
+        setWeightStatus(("Error: " + String(e)));
+      } else {
+        throw __jac_e;
+      }
+    }
+  }
+  let inputStyle = {"width": "100%", "padding": "10px 14px", "border": "1px solid #d1fae5", "borderRadius": "8px", "fontSize": "15px", "marginBottom": "4px"};
+  let labelStyle = {"display": "block", "color": "#166534", "fontWeight": "600", "marginBottom": "6px", "marginTop": "14px"};
+  return __jacJsx("div", {}, [__jacJsx("div", {"style": {"background": "#fff", "borderRadius": "12px", "padding": "28px", "boxShadow": "0 1px 3px rgba(0,0,0,0.1)", "marginBottom": "20px"}}, [__jacJsx("h2", {"style": {"color": "#166534", "marginBottom": "20px"}}, ["My Profile & Goals"]), __jacJsx("div", {"style": {"display": "grid", "gridTemplateColumns": "1fr 1fr", "gap": "16px"}}, [__jacJsx("div", {}, [__jacJsx("label", {"style": labelStyle}, ["Current Weight (kg)"]), __jacJsx("input", {"type": "number", "placeholder": "e.g. 75", "value": weight, "onChange": e => {
+    setWeight(e.target.value);
+  }, "style": inputStyle}, [])]), __jacJsx("div", {}, [__jacJsx("label", {"style": labelStyle}, ["Height (cm)"]), __jacJsx("input", {"type": "number", "placeholder": "e.g. 175", "value": height, "onChange": e => {
+    setHeight(e.target.value);
+  }, "style": inputStyle}, [])]), __jacJsx("div", {}, [__jacJsx("label", {"style": labelStyle}, ["Goal"]), __jacJsx("select", {"value": goalType, "onChange": e => {
+    setGoalType(e.target.value);
+  }, "style": inputStyle}, [__jacJsx("option", {"value": "lose"}, ["Lose Weight"]), __jacJsx("option", {"value": "gain"}, ["Gain Weight"]), __jacJsx("option", {"value": "maintain"}, ["Maintain Weight"])])]), __jacJsx("div", {}, [__jacJsx("label", {"style": labelStyle}, ["Target Weight (kg)"]), __jacJsx("input", {"type": "number", "placeholder": "e.g. 70", "value": targetWeight, "onChange": e => {
+    setTargetWeight(e.target.value);
+  }, "style": inputStyle}, [])]), __jacJsx("div", {}, [__jacJsx("label", {"style": labelStyle}, ["Daily Calorie Goal (kcal)"]), __jacJsx("input", {"type": "number", "placeholder": "e.g. 2000", "value": dailyCalories, "onChange": e => {
+    setDailyCalories(e.target.value);
+  }, "style": inputStyle}, [])]), __jacJsx("div", {}, [__jacJsx("label", {"style": labelStyle}, ["Target Deadline"]), __jacJsx("input", {"type": "date", "value": deadline, "onChange": e => {
+    setDeadline(e.target.value);
+  }, "style": inputStyle}, [])])]), __jacJsx("button", {"onClick": handleSaveGoal, "style": {"background": "#16a34a", "color": "#fff", "border": "none", "padding": "12px 28px", "borderRadius": "8px", "fontSize": "16px", "fontWeight": "600", "marginTop": "20px"}}, ["Save Profile"]), ((status && __jacJsx("p", {"style": {"marginTop": "12px", "color": ((status === "Profile saved!") ? "#16a34a" : "#dc2626"), "fontWeight": "600"}}, [status])) || null)]), __jacJsx("div", {"style": {"background": "#fff", "borderRadius": "12px", "padding": "28px", "boxShadow": "0 1px 3px rgba(0,0,0,0.1)"}}, [__jacJsx("h2", {"style": {"color": "#166534", "marginBottom": "16px"}}, ["Log Today's Weight"]), __jacJsx("div", {"style": {"display": "flex", "gap": "12px", "alignItems": "flex-end"}}, [__jacJsx("div", {"style": {"flex": "1"}}, [__jacJsx("label", {"style": labelStyle}, ["Weight (kg)"]), __jacJsx("input", {"type": "number", "placeholder": "e.g. 74.5", "value": logWeight, "onChange": e => {
+    setLogWeight(e.target.value);
+  }, "style": inputStyle}, [])]), __jacJsx("button", {"onClick": handleLogWeight, "style": {"background": "#16a34a", "color": "#fff", "border": "none", "padding": "10px 24px", "borderRadius": "8px", "fontSize": "15px", "fontWeight": "600", "marginBottom": "4px"}}, ["Log"])]), ((weightStatus && __jacJsx("p", {"style": {"marginTop": "10px", "color": ((weightStatus === "Weight logged!") ? "#16a34a" : "#dc2626"), "fontWeight": "600"}}, [weightStatus])) || null)])]);
 }
-export {LogMealForm};
-if (typeof globalThis !== "undefined") { if (!globalThis.__jacEndpointEffects__) globalThis.__jacEndpointEffects__ = {}; Object.assign(globalThis.__jacEndpointEffects__, {"func:LogMealForm": {"is_writer": true, "touches": ["*"]}}); };
-//# sourceMappingURL=LogMeal.js.map
+export {ProfileForm};
+if (typeof globalThis !== "undefined") { if (!globalThis.__jacEndpointEffects__) globalThis.__jacEndpointEffects__ = {}; Object.assign(globalThis.__jacEndpointEffects__, {"func:ProfileForm": {"is_writer": true, "touches": ["*"]}}); };
+//# sourceMappingURL=Profile.js.map

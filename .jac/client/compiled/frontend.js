@@ -1,12 +1,13 @@
 /* Source: /home/vikum_02/JacFit/frontend.cl.jac */
 import {__jacJsx, __jacSpawn} from "@jac/runtime";
 import { __jacCallFunction } from "@jac/runtime";
-import { jacSignup, jacLogin, jacIsLoggedIn } from "@jac/runtime";
+import { jacSignup, jacLogin, jacLogout, jacIsLoggedIn } from "@jac/runtime";
 import { Dashboard } from "./components/Dashboard.js";
 import { LogMealForm } from "./components/LogMeal.js";
 import { LogExerciseForm } from "./components/LogExercise.js";
 import { WeeklyTrendView } from "./components/WeeklyTrend.js";
 import { MealSuggestCard } from "./components/MealSuggest.js";
+import { ProfileForm } from "./components/Profile.js";
 import "./global.css";
 import { useState } from "@jac/runtime";
 import { useEffect } from "@jac/runtime";
@@ -30,6 +31,15 @@ async function ProgressCheck() {
 }
 async function MealSuggest() {
   return await __jacCallFunction("MealSuggest", {});
+}
+async function LogWeight() {
+  return await __jacCallFunction("LogWeight", {});
+}
+async function UpdateGoal() {
+  return await __jacCallFunction("UpdateGoal", {});
+}
+async function ExerciseSuggest() {
+  return await __jacCallFunction("ExerciseSuggest", {});
 }
 const _jac = {
   int: {
@@ -1386,6 +1396,14 @@ function app() {
     setProgressData((_jac.builtin.bool(r3.reports) ? r3.reports[0] : null));
     setLoading(false);
   }
+  function handleLogout() {
+    jacLogout();
+    setIsLoggedIn(false);
+    setUserName("");
+    setDailyData(null);
+    setWeeklyData(null);
+    setProgressData(null);
+  }
   async function handleLogin() {
     setAuthError("");
     if ((!authUser || !authPass)) {
@@ -1459,7 +1477,9 @@ function app() {
     setActiveTab("weekly");
   }, "style": {"background": ((activeTab === "weekly") ? "rgba(255,255,255,0.25)" : "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}, ["Weekly Trend"]), __jacJsx("button", {"onClick": () => {
     setActiveTab("suggest");
-  }, "style": {"background": ((activeTab === "suggest") ? "rgba(255,255,255,0.25)" : "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}, ["AI Suggest"])]]), __jacJsx("main", {"style": {"padding": "32px 24px", "maxWidth": "800px", "margin": "0 auto"}}, [(((((((loading && __jacJsx("p", {"style": {"color": "#16a34a"}}, ["Loading..."])) || ((activeTab === "dashboard") && __jacJsx(Dashboard, {"daily": dailyData, "progress": progressData}, []))) || ((activeTab === "log_meal") && __jacJsx(LogMealForm, {"userName": userName, "onDone": loadData}, []))) || ((activeTab === "log_exercise") && __jacJsx(LogExerciseForm, {"userName": userName, "onDone": loadData}, []))) || ((activeTab === "weekly") && __jacJsx(WeeklyTrendView, {"data": weeklyData}, []))) || ((activeTab === "suggest") && __jacJsx(MealSuggestCard, {"userName": userName}, []))) || __jacJsx("div", {}, []))])]);
+  }, "style": {"background": ((activeTab === "suggest") ? "rgba(255,255,255,0.25)" : "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}, ["AI Suggest"]), __jacJsx("button", {"onClick": () => {
+    setActiveTab("profile");
+  }, "style": {"background": ((activeTab === "profile") ? "rgba(255,255,255,0.25)" : "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}, ["Profile"])], __jacJsx("span", {"style": {"flex": "1"}}, []), __jacJsx("span", {"style": {"color": "rgba(255,255,255,0.8)", "fontSize": "13px", "marginRight": "12px"}}, [userName]), __jacJsx("button", {"onClick": handleLogout, "style": {"background": "rgba(255,255,255,0.15)", "color": "#fff", "border": "1px solid rgba(255,255,255,0.4)", "padding": "6px 14px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "13px"}}, ["Logout"])]), __jacJsx("main", {"style": {"padding": "32px 24px", "maxWidth": "800px", "margin": "0 auto"}}, [((((((((loading && __jacJsx("p", {"style": {"color": "#16a34a"}}, ["Loading..."])) || ((activeTab === "dashboard") && __jacJsx(Dashboard, {"daily": dailyData, "progress": progressData}, []))) || ((activeTab === "log_meal") && __jacJsx(LogMealForm, {"userName": userName, "onDone": loadData}, []))) || ((activeTab === "log_exercise") && __jacJsx(LogExerciseForm, {"userName": userName, "onDone": loadData}, []))) || ((activeTab === "weekly") && __jacJsx(WeeklyTrendView, {"data": weeklyData}, []))) || ((activeTab === "suggest") && __jacJsx(MealSuggestCard, {"userName": userName}, []))) || ((activeTab === "profile") && __jacJsx(ProfileForm, {"userName": userName, "onDone": loadData}, []))) || __jacJsx("div", {}, []))])]);
 }
 export {app};
 if (typeof globalThis !== "undefined") { if (!globalThis.__jacEndpointEffects__) globalThis.__jacEndpointEffects__ = {}; Object.assign(globalThis.__jacEndpointEffects__, {"func:app": {"is_writer": true, "touches": ["*"]}}); };

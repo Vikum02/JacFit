@@ -1,14 +1,16 @@
 sv import from .backend {
     CreateUser, LogMeal, LogExercise,
-    DailyReport, WeeklyTrend, ProgressCheck, MealSuggest
+    DailyReport, WeeklyTrend, ProgressCheck, MealSuggest,
+    LogWeight, UpdateGoal, ExerciseSuggest
 }
 
-import from "@jac/runtime" { jacSignup, jacLogin, jacIsLoggedIn }
+import from "@jac/runtime" { jacSignup, jacLogin, jacLogout, jacIsLoggedIn }
 import from .components.Dashboard { Dashboard }
 import from .components.LogMeal { LogMealForm }
 import from .components.LogExercise { LogExerciseForm }
 import from .components.WeeklyTrend { WeeklyTrendView }
 import from .components.MealSuggest { MealSuggestCard }
+import from .components.Profile { ProfileForm }
 
 import "./global.css";
 
@@ -34,6 +36,15 @@ def:pub app -> JsxElement {
         r3 = root spawn ProgressCheck(user_name=userName);
         progressData = r3.reports[0] if r3.reports else None;
         loading = False;
+    }
+
+    def handleLogout {
+        jacLogout();
+        isLoggedIn = False;
+        userName = "";
+        dailyData = None;
+        weeklyData = None;
+        progressData = None;
     }
 
     async def handleLogin {
@@ -151,8 +162,12 @@ def:pub app -> JsxElement {
                     <button onClick={lambda { activeTab = "log_meal";}} style={{"background": ("rgba(255,255,255,0.25)" if activeTab == "log_meal" else "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}>Log Meal</button>,
                     <button onClick={lambda { activeTab = "log_exercise";}} style={{"background": ("rgba(255,255,255,0.25)" if activeTab == "log_exercise" else "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}>Log Exercise</button>,
                     <button onClick={lambda { activeTab = "weekly";}} style={{"background": ("rgba(255,255,255,0.25)" if activeTab == "weekly" else "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}>Weekly Trend</button>,
-                    <button onClick={lambda { activeTab = "suggest";}} style={{"background": ("rgba(255,255,255,0.25)" if activeTab == "suggest" else "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}>AI Suggest</button>
+                    <button onClick={lambda { activeTab = "suggest";}} style={{"background": ("rgba(255,255,255,0.25)" if activeTab == "suggest" else "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}>AI Suggest</button>,
+                    <button onClick={lambda { activeTab = "profile";}} style={{"background": ("rgba(255,255,255,0.25)" if activeTab == "profile" else "transparent"), "color": "#fff", "border": "none", "padding": "8px 16px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "14px"}}>Profile</button>
                 ]}
+                <span style={{"flex": "1"}} />
+                <span style={{"color": "rgba(255,255,255,0.8)", "fontSize": "13px", "marginRight": "12px"}}>{userName}</span>
+                <button onClick={handleLogout} style={{"background": "rgba(255,255,255,0.15)", "color": "#fff", "border": "1px solid rgba(255,255,255,0.4)", "padding": "6px 14px", "borderRadius": "8px", "fontWeight": "600", "fontSize": "13px"}}>Logout</button>
             </nav>
             <main style={{"padding": "32px 24px", "maxWidth": "800px", "margin": "0 auto"}}>
                 {(loading
@@ -167,6 +182,8 @@ def:pub app -> JsxElement {
                     and <WeeklyTrendView data={weeklyData} />)
                 or (activeTab == "suggest"
                     and <MealSuggestCard userName={userName} />)
+                or (activeTab == "profile"
+                    and <ProfileForm userName={userName} onDone={loadData} />)
                 or <div/>}
             </main>
         </div>;

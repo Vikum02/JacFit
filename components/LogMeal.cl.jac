@@ -14,23 +14,27 @@ def:pub LogMealForm(userName: str, onDone: Any) -> JsxElement {
             status = "Meal name and calories are required.";
             return;
         }
-        root spawn LogMeal(
-            user_name=userName,
-            meal_name=mealName,
-            meal_time=mealTime,
-            calories=float(calories),
-            protein=float(protein) if protein else 0.0,
-            carbs=float(carbs) if carbs else 0.0,
-            fat=float(fat) if fat else 0.0
-        );
-        status = "Meal logged!";
-        mealName = "";
-        mealTime = "";
-        calories = "";
-        protein = "";
-        carbs = "";
-        fat = "";
-        onDone();
+        try {
+            root spawn LogMeal(
+                user_name=userName,
+                meal_name=mealName,
+                meal_time=mealTime,
+                calories=float(calories),
+                protein=float(protein) if protein else 0.0,
+                carbs=float(carbs) if carbs else 0.0,
+                fat=float(fat) if fat else 0.0
+            );
+            status = "Meal logged!";
+            mealName = "";
+            mealTime = "";
+            calories = "";
+            protein = "";
+            carbs = "";
+            fat = "";
+            onDone();
+        } except Exception as e {
+            status = "Error: " + str(e);
+        }
     }
 
     inputStyle = {"width": "100%", "padding": "10px 14px", "border": "1px solid #d1fae5", "borderRadius": "8px", "fontSize": "15px"};
